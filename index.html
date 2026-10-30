@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Your website portal · Signal Set</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#111;--muted:#5b5b5b;--line:#e3e1db;--bg:#f5f4f0;--card:#fff;--bad:#b42318;--good:#1b7f3b;--r:14px}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+.brand{font-weight:700;letter-spacing:-.01em;font-size:15px;margin:0 0 18px}
+.brand span{color:var(--muted);font-weight:500}
+.card{width:100%;max-width:400px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:32px 28px;box-shadow:0 18px 40px -30px rgba(0,0,0,.35)}
+h1{font-size:23px;line-height:1.25;margin:0 0 6px;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0 0 24px;font-size:15px}
+label{display:block;font-size:14px;font-weight:600;margin:0 0 6px}
+.field{position:relative;margin:0 0 16px}
+input{width:100%;font:inherit;min-height:48px;padding:11px 14px;border:1.5px solid #cfccc3;border-radius:10px;background:#fff;color:var(--ink)}
+input:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(17,17,17,.12)}
+.show{position:absolute;right:6px;bottom:6px;min-height:36px;padding:0 10px;border:0;background:none;font:inherit;font-size:13.5px;color:var(--muted);cursor:pointer;border-radius:8px}
+.show:hover{color:var(--ink)}
+.btn{width:100%;min-height:48px;border:0;border-radius:10px;background:var(--ink);color:#fff;font:inherit;font-weight:600;cursor:pointer;margin-top:4px}
+.btn:hover{background:#2a2a2a}
+.btn[disabled]{opacity:.6;cursor:default}
+.btn.ghost{background:none;color:var(--ink);border:1.5px solid #cfccc3}
+.btn.ghost:hover{background:#f1f0eb}
+.link{display:inline-block;margin-top:16px;background:none;border:0;padding:6px 0;font:inherit;font-size:14.5px;color:var(--ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer;min-height:36px}
+.msg{font-size:14.5px;margin:0 0 16px;padding:10px 12px;border-radius:10px}
+.msg.bad{background:#fdecea;color:var(--bad)}
+.msg.good{background:#e9f6ee;color:var(--good)}
+.msg:empty{display:none}
+.hint{font-size:13.5px;color:var(--muted);margin:-8px 0 16px}
+[hidden]{display:none!important}
+:focus-visible{outline:3px solid #6a8cff;outline-offset:2px}
+</style>
+</head>
+<body>
+<p class="brand">Signal Set <span>· your website portal</span></p>
+
+<main class="card" aria-live="polite">
+  <p class="msg" id="msg" role="status"></p>
+
+  <section id="v-loading"><p class="sub" style="margin:0">One moment&hellip;</p></section>
+
+  <section id="v-signin" hidden>
+    <h1>Sign in</h1>
+    <p class="sub">To ask for changes to your site and see your inquiries.</p>
+    <form id="f-signin" novalidate>
+      <div class="field"><label for="si-email">Email</label><input id="si-email" type="email" autocomplete="email" required></div>
+      <div class="field"><label for="si-pw">Password</label><input id="si-pw" type="password" autocomplete="current-password" required><button type="button" class="show" data-for="si-pw">Show</button></div>
+      <button class="btn" type="submit">Sign in</button>
+    </form>
+    <button class="link" type="button" data-go="forgot">Forgot your password?</button>
+  </section>
+
+  <section id="v-forgot" hidden>
+    <h1>Reset your password</h1>
+    <p class="sub">We'll email you a link to set a new one.</p>
+    <form id="f-forgot" novalidate>
+      <div class="field"><label for="fg-email">Email</label><input id="fg-email" type="email" autocomplete="email" required></div>
+      <button class="btn" type="submit">Email me a link</button>
+    </form>
+    <button class="link" type="button" data-go="signin">Back to sign in</button>
+  </section>
+
+  <section id="v-setpw" hidden>
+    <h1 id="setpw-h">Set your password</h1>
+    <p class="sub" id="setpw-sub">You'll use it with your email to sign in.</p>
+    <form id="f-setpw" novalidate>
+      <div class="field"><label for="sp-pw">New password</label><input id="sp-pw" type="password" autocomplete="new-password" minlength="8" required><button type="button" class="show" data-for="sp-pw">Show</button></div>
+      <p class="hint">At least 8 characters.</p>
+      <div class="field"><label for="sp-pw2">Type it again</label><input id="sp-pw2" type="password" autocomplete="new-password" minlength="8" required></div>
+      <button class="btn" type="submit">Save password</button>
+    </form>
+  </section>
+
+  <section id="v-home" hidden>
+    <h1>You're in</h1>
+    <p class="sub">Signed in as <b id="who"></b>.</p>
+    <button class="btn ghost" type="button" id="signout">Sign out</button>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+<script>
+(function(){
+  var URL_ = 'https://bitmyvxqbsrqyclqqbjf.supabase.co';
+  var KEY = 'sb_publishable_vpx0GRAw0ei3qjhPy3ztdw_pomWPZz2'; // publishable: safe in a web page, the database's own rules guard everything
+  var here = location.origin + location.pathname;
+
+  // An invite or reset link lands here with its type and token after the #.
+  // Read it before the client takes the token out of the address.
+  var hash = new URLSearchParams(location.hash.slice(1));
+  var linkType = hash.get('type');
+  var linkError = hash.get('error_code') || hash.get('error');
+
+  var sb = supabase.createClient(URL_, KEY, { auth: { flowType: 'implicit', persistSession: true, detectSessionInUrl: true } });
+  var msg = document.getElementById('msg');
+
+  function say(text, good){ msg.textContent = text || ''; msg.className = 'msg ' + (good ? 'good' : 'bad'); }
+  function show(view){
+    ['loading','signin','forgot','setpw','home'].forEach(function(v){ document.getElementById('v-' + v).hidden = v !== view; });
+    var first = document.querySelector('#v-' + view + ' input');
+    if (first) first.focus();
+  }
+  function busy(form, on){ var b = form.querySelector('button[type=submit]'); b.disabled = on; }
+  function plain(err){
+    var m = String(err && err.message || err || '');
+    if (/invalid login credentials/i.test(m)) return "That email and password don't match. Try again, or reset your password.";
+    if (/rate limit|too many/i.test(m)) return 'Too many tries for now. Please wait a few minutes and try again.';
+    if (/same.*password|different from the old/i.test(m)) return 'Please pick a password different from your old one.';
+    if (/weak|at least/i.test(m)) return 'Please use at least 8 characters.';
+    return 'Something went wrong. Please try again.';
+  }
+  function goHome(user){ document.getElementById('who').textContent = user.email; show('home'); }
+
+  document.querySelectorAll('[data-go]').forEach(function(b){ b.addEventListener('click', function(){ say(''); show(b.dataset.go); }); });
+  document.querySelectorAll('.show').forEach(function(b){ b.addEventListener('click', function(){
+    var i = document.getElementById(b.dataset.for); var on = i.type === 'password';
+    i.type = on ? 'text' : 'password'; b.textContent = on ? 'Hide' : 'Show';
+  }); });
+
+  document.getElementById('f-signin').addEventListener('submit', async function(e){
+    e.preventDefault(); say('');
+    var email = document.getElementById('si-email').value.trim(), pw = document.getElementById('si-pw').value;
+    if (!email || !pw) return say('Please type your email and password.');
+    busy(this, true);
+    var r = await sb.auth.signInWithPassword({ email: email, password: pw });
+    busy(this, false);
+    if (r.error) return say(plain(r.error));
+    goHome(r.data.user);
+  });
+
+  document.getElementById('f-forgot').addEventListener('submit', async function(e){
+    e.preventDefault(); say('');
+    var email = document.getElementById('fg-email').value.trim();
+    if (!email) return say('Please type your email.');
+    busy(this, true);
+    var r = await sb.auth.resetPasswordForEmail(email, { redirectTo: here });
+    busy(this, false);
+    if (r.error && /rate limit|too many/i.test(r.error.message)) return say(plain(r.error));
+    // The same answer whether or not the email has an account.
+    say('If that email has a portal, a link to set a new password is on its way. It works for 24 hours.', true);
+    show('signin');
+  });
+
+  document.getElementById('f-setpw').addEventListener('submit', async function(e){
+    e.preventDefault(); say('');
+    var a = document.getElementById('sp-pw').value, b = document.getElementById('sp-pw2').value;
+    if (a.length < 8) return say('Please use at least 8 characters.');
+    if (a !== b) return say("The two passwords don't match.");
+    busy(this, true);
+    var r = await sb.auth.updateUser({ password: a });
+    busy(this, false);
+    if (r.error) return say(plain(r.error));
+    history.replaceState(null, '', here);
+    say('Password saved.', true);
+    goHome(r.data.user);
+  });
+
+  document.getElementById('signout').addEventListener('click', async function(){
+    await sb.auth.signOut();
+    say('Signed out.', true);
+    show('signin');
+  });
+
+  (async function start(){
+    if (linkError) {
+      history.replaceState(null, '', here);
+      say('That link has run out or was already used. Ask Sunny for a new invite, or reset your password below.');
+      return show('signin');
+    }
+    var s = (await sb.auth.getSession()).data.session;
+    if (s && (linkType === 'invite' || linkType === 'recovery')) {
+      document.getElementById('setpw-h').textContent = linkType === 'invite' ? 'Welcome. Set your password' : 'Set a new password';
+      return show('setpw');
+    }
+    if (s) return goHome(s.user);
+    show('signin');
+  })();
+})();
+</script>
+</body>
+</html>
