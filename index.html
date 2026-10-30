@@ -11,7 +11,8 @@
 <style>
 :root{--ink:#111;--muted:#5b5b5b;--line:#e3e1db;--bg:#f5f4f0;--card:#fff;--bad:#b42318;--good:#1b7f3b;--r:14px}
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+#auth{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px}
 .brand{font-weight:700;letter-spacing:-.01em;font-size:15px;margin:0 0 18px}
 .brand span{color:var(--muted);font-weight:500}
 .card{width:100%;max-width:400px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:32px 28px;box-shadow:0 18px 40px -30px rgba(0,0,0,.35)}
@@ -36,9 +37,140 @@ input:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(17,17
 .hint{font-size:13.5px;color:var(--muted);margin:-8px 0 16px}
 [hidden]{display:none!important}
 :focus-visible{outline:3px solid #6a8cff;outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* The portal, in the client's own colors (set from clients.colors). */
+.app{--c-ink:#111;--c-accent:#d9d2bf;--c-paper:#fff;--c-cream:#f5f4f0;--c-line:#e3e1db;--c-font:Inter;
+  min-height:100vh;background:var(--c-cream);color:var(--c-ink);font-family:var(--c-font),Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+.app :focus-visible{outline:3px solid var(--c-ink);outline-offset:2px}
+.bar{background:var(--c-ink);color:var(--c-paper);position:sticky;top:0;z-index:20}
+.bar .in{max-width:880px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:6px 18px;min-height:64px;flex-wrap:wrap}
+.bar :focus-visible{outline-color:var(--c-accent)}
+.who-name{font-weight:800;font-size:18px;letter-spacing:-.01em;margin:0;line-height:1.2}
+.site{color:var(--c-paper);opacity:.8;font-size:14px;display:inline-flex;align-items:center;min-height:44px;text-underline-offset:3px}
+.site:hover{opacity:1}
+.tabs{display:flex;gap:2px;margin-left:auto}
+.tab{background:none;border:0;border-bottom:3px solid transparent;color:inherit;font:inherit;font-weight:700;font-size:15px;min-height:48px;padding:0 14px;cursor:pointer;opacity:.7;display:inline-flex;align-items:center}
+.tab:hover{opacity:1}
+.tab[aria-selected="true"]{opacity:1;border-bottom-color:var(--c-accent)}
+.count{background:var(--c-accent);color:var(--c-ink);border-radius:999px;font-size:12px;font-weight:800;line-height:1;padding:4px 7px;margin-left:7px}
+.out{background:none;border:1.5px solid rgba(255,255,255,.35);color:inherit;border-radius:999px;font:inherit;font-size:14px;font-weight:600;min-height:44px;padding:0 16px;cursor:pointer}
+.out:hover{border-color:var(--c-paper)}
+.wrap{max-width:880px;margin:0 auto;padding:26px 20px 90px}
+.app h2{font-size:15px;letter-spacing:.06em;text-transform:uppercase;margin:38px 0 12px;font-weight:800}
+.empty{color:#5b5b5b;margin:8px 0 0}
+.abtn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 18px;border-radius:10px;border:1.5px solid var(--c-ink);background:var(--c-ink);color:var(--c-paper);font:inherit;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none}
+.abtn.ghost{background:transparent;color:var(--c-ink);border-color:#cfccc3}
+.abtn.ghost:hover{border-color:var(--c-ink)}
+.abtn.hot{background:var(--c-accent);border-color:var(--c-accent);color:var(--c-ink)}
+.abtn[disabled]{opacity:.55;cursor:default}
+.app textarea{width:100%;font:inherit;font-size:16px;line-height:1.5;padding:12px 14px;border:1.5px solid #cfccc3;border-radius:10px;background:var(--c-paper);color:var(--c-ink);resize:vertical;min-height:90px}
+.app textarea:focus{outline:none;border-color:var(--c-ink);box-shadow:0 0 0 3px rgba(0,0,0,.1)}
+
+/* the box */
+.compose{background:var(--c-paper);border:1px solid var(--c-line);border-radius:16px;padding:22px;transition:outline-color .15s}
+.compose label{font-size:22px;font-weight:800;letter-spacing:-.01em;margin:0 0 12px}
+.compose textarea{min-height:130px;font-size:17px}
+.compose.drag{outline:2.5px dashed var(--c-ink);outline-offset:4px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+.row .grow{flex:1}
+.drop-hint{font-size:14px;color:#5b5b5b}
+.chips{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.chips li{display:inline-flex;align-items:center;gap:4px;background:var(--c-cream);border:1px solid var(--c-line);border-radius:999px;padding:0 4px 0 14px;font-size:14px;max-width:100%}
+.chips li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px}
+.chips button{background:none;border:0;font:inherit;font-size:20px;line-height:1;width:44px;height:44px;cursor:pointer;color:inherit;border-radius:999px}
+.prog{margin-top:12px;font-size:14px}
+.prog .track{height:6px;border-radius:999px;background:var(--c-cream);overflow:hidden;margin-top:6px}
+.prog .fill{height:100%;width:0;background:var(--c-ink);transition:width .2s}
+
+/* request cards */
+.rq{background:var(--c-paper);border:1px solid var(--c-line);border-radius:16px;padding:18px 20px;margin-top:12px;display:grid;grid-template-columns:1fr;gap:18px}
+.rq.has-q{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
+.rq-main{min-width:0}
+.rq-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 8px}
+.rq-top time{font-size:13.5px;color:#5b5b5b}
+.st{display:inline-flex;align-items:center;gap:9px;font-weight:800;font-size:15px}
+.st i{width:11px;height:11px;border-radius:50%;border:2px solid var(--c-ink);flex:none}
+.st.go i{border-color:var(--c-ink);background:var(--c-ink);animation:pulse 1.6s ease-in-out infinite}
+.st.hot i{background:var(--c-accent);border-color:var(--c-ink)}
+.st.live i{background:var(--good);border-color:var(--good)}
+.st.fail i{background:var(--bad);border-color:var(--bad)}
+@keyframes pulse{50%{opacity:.35}}
+.txt{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.rq.open .txt{display:block;-webkit-line-clamp:unset}
+.what{margin:8px 0 0;font-size:15px}
+.what b{font-weight:700}
+.more{background:none;border:0;padding:0;font:inherit;font-size:14.5px;font-weight:600;text-decoration:underline;text-underline-offset:3px;cursor:pointer;color:inherit;min-height:44px}
+.sent-files{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0;padding:0;list-style:none}
+.sent-files button{background:var(--c-cream);border:1px solid var(--c-line);border-radius:8px;font:inherit;font-size:13.5px;min-height:44px;padding:0 12px;cursor:pointer;color:inherit;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.notes{list-style:none;margin:14px 0 0;padding:12px 0 0;border-top:1px solid var(--c-line);display:grid;gap:10px}
+.notes li{font-size:15px;white-space:pre-wrap;overflow-wrap:anywhere}
+.notes b{display:block;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:#5b5b5b}
+.acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.ask{margin-top:14px;padding:14px;background:var(--c-cream);border-radius:12px}
+.ask p{margin:0 0 10px;font-weight:700}
+.qpanel{background:var(--c-cream);border-left:4px solid var(--c-accent);border-radius:12px;padding:16px;align-self:start}
+.qpanel .q-h{font-size:13px;letter-spacing:.06em;text-transform:uppercase;font-weight:800;margin:0 0 6px}
+.qpanel .q{margin:0 0 12px;font-size:16px;white-space:pre-wrap;overflow-wrap:anywhere}
+.qpanel label{font-size:14px}
+.qpanel .abtn{margin-top:10px}
+
+/* saved versions */
+.vers{list-style:none;margin:0;padding:0;background:var(--c-paper);border:1px solid var(--c-line);border-radius:16px}
+.vers li{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px 16px;border-bottom:1px solid var(--c-line)}
+.vers li:last-child{border-bottom:0}
+.vers .lbl{flex:1;min-width:180px;font-weight:600;overflow-wrap:anywhere}
+.vers .lbl small{display:block;font-weight:400;color:#5b5b5b;font-size:13.5px}
+.vers .now{font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:0 12px}
+.vers .abtn{min-height:44px;font-size:14px}
+.vers .confirm{flex-basis:100%;display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:4px 0 6px}
+
+/* inquiries */
+.inq{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.iq{background:var(--c-paper);border:1px solid var(--c-line);border-radius:14px}
+.iq.new{border-left:5px solid var(--c-accent)}
+.iq-head{width:100%;background:none;border:0;font:inherit;color:inherit;text-align:left;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 14px;padding:14px 18px;min-height:64px;border-radius:14px}
+.iq-name{font-weight:600}
+.iq.new .iq-name{font-weight:800}
+.iq-line{grid-column:1;color:#5b5b5b;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.iq-date{grid-column:2;grid-row:1;font-size:13.5px;color:#5b5b5b;white-space:nowrap}
+.iq-tag{font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;background:var(--c-accent);color:var(--c-ink);border-radius:999px;padding:2px 8px;margin-left:8px;vertical-align:1px}
+.iq-body{padding:0 18px 16px}
+.iq-body .full{white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 12px}
+.iq.open .iq-line{display:none}
+.iq-body dl{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:2px 14px;margin:0 0 12px;font-size:15px}
+.iq-body dt{color:#5b5b5b}
+.iq-body dd{margin:0;overflow-wrap:anywhere;min-height:26px;display:flex;align-items:center}
+.iq-body a{min-height:44px;display:inline-flex;align-items:center;color:var(--c-ink);font-weight:600;text-underline-offset:3px}
+
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--c-ink);color:var(--c-paper);padding:12px 18px;border-radius:12px;font-size:15px;font-weight:600;max-width:calc(100% - 32px);z-index:30;box-shadow:0 12px 30px -12px rgba(0,0,0,.5)}
+.toast:empty{display:none}
+
+@media (max-width:700px){
+  .rq.has-q{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .bar .in{padding:6px 12px 0 16px;gap:0 6px}
+  .who-name{font-size:17px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .site{order:1;padding:0 6px}
+  .out{order:2;padding:0 12px}
+  .tabs{order:3;flex-basis:100%;margin:0}
+  .tab{flex:1;justify-content:center}
+  .wrap{padding:18px 16px 90px}
+  .compose{padding:18px 16px}
+  .compose label{font-size:20px}
+  .drop-hint{display:none}
+  .row .abtn{flex:1}
+  .rq{padding:16px}
+}
+@media (prefers-reduced-motion:reduce){
+  .st.go i{animation:none}
+  .prog .fill,.compose{transition:none}
+}
 </style>
 </head>
 <body>
+<div id="auth">
 <p class="brand">Signal Set <span>· your website portal</span></p>
 
 <main class="card" aria-live="polite">
@@ -77,13 +209,55 @@ input:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(17,17
       <button class="btn" type="submit">Save password</button>
     </form>
   </section>
-
-  <section id="v-home" hidden>
-    <h1>You're in</h1>
-    <p class="sub">Signed in as <b id="who"></b>.</p>
-    <button class="btn ghost" type="button" id="signout">Sign out</button>
-  </section>
 </main>
+</div>
+
+<div id="v-home" class="app" hidden>
+  <header class="bar">
+    <div class="in">
+      <p class="who-name" id="c-name">Your site</p>
+      <a class="site" id="c-site" target="_blank" rel="noopener" hidden>Your site &#8599;</a>
+      <div class="tabs" role="tablist" aria-label="Portal" id="tabs">
+        <button class="tab" role="tab" id="tab-changes" aria-controls="p-changes" aria-selected="true" data-act="tab" data-tab="changes">Changes</button>
+        <button class="tab" role="tab" id="tab-inq" aria-controls="p-inq" aria-selected="false" data-act="tab" data-tab="inq">Inquiries<span class="count" id="inq-count" hidden></span></button>
+      </div>
+      <button class="out" type="button" id="signout">Sign out</button>
+      <span class="sr">Signed in as <b id="who"></b></span>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <p class="empty" id="no-client" hidden>Your portal isn't ready yet. Sunny will let you know when it is.</p>
+
+    <section id="p-changes" role="tabpanel" aria-labelledby="tab-changes">
+      <form class="compose" id="compose" novalidate>
+        <label for="ask">What should change?</label>
+        <textarea id="ask" placeholder="For example: add my new TV clip to the On screen part."></textarea>
+        <ul class="chips" id="chips" aria-label="Photos and videos to send"></ul>
+        <div class="prog" id="prog" hidden><span id="prog-t">Uploading&hellip;</span><div class="track"><div class="fill" id="prog-f"></div></div></div>
+        <div class="row">
+          <input type="file" id="pick" accept="image/*,video/*" multiple hidden>
+          <button class="abtn ghost" type="button" data-act="attach">Add photos or videos</button>
+          <span class="drop-hint grow">or drop them here</span>
+          <button class="abtn" type="submit" id="send">Send</button>
+        </div>
+      </form>
+
+      <div id="cards" aria-live="polite"></div>
+
+      <div id="vers-wrap" hidden>
+        <h2>Saved versions</h2>
+        <ul class="vers" id="vers"></ul>
+      </div>
+    </section>
+
+    <section id="p-inq" role="tabpanel" aria-labelledby="tab-inq" hidden>
+      <ul class="inq" id="inq"></ul>
+      <p class="empty" id="inq-empty" hidden>No inquiries yet. When someone fills in the form on your site, it shows up here.</p>
+    </section>
+  </main>
+  <p class="toast" id="toast" role="status" aria-live="polite"></p>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 <script>
@@ -103,7 +277,11 @@ input:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(17,17
 
   function say(text, good){ msg.textContent = text || ''; msg.className = 'msg ' + (good ? 'good' : 'bad'); }
   function show(view){
-    ['loading','signin','forgot','setpw','home'].forEach(function(v){ document.getElementById('v-' + v).hidden = v !== view; });
+    var inApp = view === 'home';
+    document.getElementById('auth').hidden = inApp;
+    document.getElementById('v-home').hidden = !inApp;
+    ['loading','signin','forgot','setpw'].forEach(function(v){ document.getElementById('v-' + v).hidden = v !== view; });
+    if (inApp) return;
     var first = document.querySelector('#v-' + view + ' input');
     if (first) first.focus();
   }
@@ -116,7 +294,6 @@ input:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(17,17
     if (/weak|at least/i.test(m)) return 'Please use at least 8 characters.';
     return 'Something went wrong. Please try again.';
   }
-  function goHome(user){ document.getElementById('who').textContent = user.email; show('home'); }
 
   document.querySelectorAll('[data-go]').forEach(function(b){ b.addEventListener('click', function(){ say(''); show(b.dataset.go); }); });
   document.querySelectorAll('.show').forEach(function(b){ b.addEventListener('click', function(){
@@ -132,7 +309,7 @@ input:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(17,17
     var r = await sb.auth.signInWithPassword({ email: email, password: pw });
     busy(this, false);
     if (r.error) return say(plain(r.error));
-    goHome(r.data.user);
+    openApp(r.data.user);
   });
 
   document.getElementById('f-forgot').addEventListener('submit', async function(e){
@@ -159,13 +336,373 @@ input:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(17,17
     if (r.error) return say(plain(r.error));
     history.replaceState(null, '', here);
     say('Password saved.', true);
-    goHome(r.data.user);
+    openApp(r.data.user);
   });
 
   document.getElementById('signout').addEventListener('click', async function(){
+    closeApp();
     await sb.auth.signOut();
     say('Signed out.', true);
     show('signin');
+  });
+
+  // ---------------------------------------------------------------------
+  // The portal: Changes (the box, request cards, saved versions) and
+  // Inquiries. Everything is read again every 15 seconds while the page is
+  // showing, and right after anything the client does.
+
+  var MAX = 500 * 1024 * 1024;
+  var app = { slug: null, data: null, sig: '', timer: null, tab: 'changes', files: [], sending: false,
+    open: {}, change: {}, confirm: null, verConfirm: null, inqOpen: {}, drafts: {} };
+  var $ = function(id){ return document.getElementById(id); };
+  var toastTimer;
+
+  function toast(text){
+    var t = $('toast'); t.textContent = text;
+    clearTimeout(toastTimer); toastTimer = setTimeout(function(){ t.textContent = ''; }, 4200);
+  }
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function safeUrl(u){ return /^https?:\/\//i.test(String(u || '')) ? String(u) : null; }
+  function uuid(){
+    if (crypto.randomUUID) return crypto.randomUUID();
+    var b = crypto.getRandomValues(new Uint8Array(16)); b[6] = (b[6] & 15) | 64; b[8] = (b[8] & 63) | 128;
+    var h = Array.from(b, function(x){ return x.toString(16).padStart(2, '0'); }).join('');
+    return h.slice(0, 8) + '-' + h.slice(8, 12) + '-' + h.slice(12, 16) + '-' + h.slice(16, 20) + '-' + h.slice(20);
+  }
+  function when(ts){
+    if (!ts) return '';
+    var d = new Date(ts), now = new Date();
+    var time = d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    var day = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    var diff = Math.round((day - new Date(d.getFullYear(), d.getMonth(), d.getDate())) / 86400000);
+    if (diff === 0) return 'Today, ' + time;
+    if (diff === 1) return 'Yesterday, ' + time;
+    if (d.getFullYear() === now.getFullYear()) return d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ', ' + time;
+    return d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+  function day(ts){ return new Date(ts).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }); }
+  function size(n){ return n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB'; }
+
+  function openApp(user){
+    $('who').textContent = user.email;
+    app.slug = (user.app_metadata || {}).client || null;
+    show('home');
+    $('no-client').hidden = !!app.slug;
+    $('p-changes').hidden = !app.slug || app.tab !== 'changes';
+    $('p-inq').hidden = !app.slug || app.tab !== 'inq';
+    $('tabs').hidden = !app.slug;
+    if (!app.slug) return;
+    load(true);
+    clearInterval(app.timer);
+    app.timer = setInterval(function(){ if (!document.hidden) load(false); }, 15000);
+  }
+  function closeApp(){
+    clearInterval(app.timer);
+    app = { slug: null, data: null, sig: '', timer: null, tab: 'changes', files: [], sending: false,
+      open: {}, change: {}, confirm: null, verConfirm: null, inqOpen: {}, drafts: {} };
+    $('cards').innerHTML = ''; $('vers').innerHTML = ''; $('inq').innerHTML = ''; $('chips').innerHTML = ''; $('ask').value = '';
+  }
+  document.addEventListener('visibilitychange', function(){ if (!document.hidden && app.slug) load(false); });
+  sb.auth.onAuthStateChange(function(event){ if (event === 'SIGNED_OUT' && app.slug) { closeApp(); show('signin'); } });
+
+  async function load(force){
+    if (!app.slug) return;
+    var r = await Promise.all([
+      sb.from('clients').select('slug,name,site_url,colors').maybeSingle(),
+      sb.from('requests').select('id,kind,body,version_id,status,summary,preview_url,created_at,updated_at,live_at').order('created_at', { ascending: false }).limit(100),
+      sb.from('notes').select('id,request_id,author,body,created_at').order('created_at', { ascending: true }).limit(1000),
+      sb.from('files').select('id,request_id,name,path,size,type,created_at').order('created_at', { ascending: true }).limit(1000),
+      sb.from('versions').select('id,label,url,created_at').order('created_at', { ascending: false }).limit(50),
+      sb.from('inquiries').select('id,name,email,phone,message,details,page,created_at,answered_at').order('created_at', { ascending: false }).limit(200)
+    ]);
+    var bad = r.find(function(x){ return x.error; });
+    if (bad) { if (force) toast("Couldn't load just now. Trying again shortly."); return; }
+    var data = { client: r[0].data, requests: r[1].data, notes: r[2].data, files: r[3].data, versions: r[4].data, inquiries: r[5].data };
+    var sig = JSON.stringify(data);
+    // Typing in a card or inquiry? Leave the page alone until the next round.
+    var typing = document.activeElement && document.activeElement.matches('#cards textarea, #vers textarea');
+    if (!force && (sig === app.sig || typing)) return;
+    app.sig = sig; app.data = data;
+    render();
+  }
+
+  function theme(client){
+    var el = $('v-home'), c = (client && client.colors) || {};
+    ['ink', 'accent', 'paper', 'cream', 'line'].forEach(function(k){
+      if (/^#[0-9a-f]{3,8}$/i.test(c[k] || '')) el.style.setProperty('--c-' + k, c[k]);
+    });
+    if (/^[A-Za-z ]{2,40}$/.test(c.font || '') && !document.getElementById('c-font')) {
+      var l = document.createElement('link'); l.id = 'c-font'; l.rel = 'stylesheet';
+      l.href = 'https://fonts.googleapis.com/css2?family=' + encodeURIComponent(c.font) + ':wght@400;600;700;800&display=swap';
+      document.head.appendChild(l);
+      el.style.setProperty('--c-font', '"' + c.font + '"');
+    }
+  }
+
+  function render(){
+    var d = app.data, client = d.client;
+    theme(client);
+    $('c-name').textContent = client ? client.name : 'Your site';
+    var site = client && safeUrl(client.site_url);
+    $('c-site').hidden = !site; if (site) $('c-site').href = site;
+    var open = d.inquiries.filter(function(q){ return !q.answered_at; }).length;
+    $('inq-count').hidden = !open; $('inq-count').textContent = open;
+    $('inq-count').setAttribute('aria-label', open + ' not answered');
+    renderCards(); renderVersions(); renderInquiries();
+  }
+
+  var WORDS = { new: 'Got it', working: 'Working on it', answered: 'Working on it', redo: 'Working on it',
+    question: 'Question for you', preview: 'Preview ready', approved: 'Going live', live: 'Live', failed: 'Sunny is looking at it' };
+  var LOOK = { working: 'go', answered: 'go', redo: 'go', approved: 'go', question: 'hot', preview: 'hot', live: 'live', failed: 'fail' };
+
+  function renderCards(){
+    var d = app.data, versions = {};
+    d.versions.forEach(function(v){ versions[v.id] = v; });
+    if (!d.requests.length) { $('cards').innerHTML = ''; return; }
+    $('cards').innerHTML = d.requests.map(function(q){
+      var notes = d.notes.filter(function(n){ return n.request_id === q.id; });
+      var files = d.files.filter(function(f){ return f.request_id === q.id; });
+      var asked = q.status === 'question' ? notes.filter(function(n){ return n.author === 'system'; }).pop() : null;
+      var isOpen = !!app.open[q.id];
+      var title = q.kind === 'restore'
+        ? 'Going back to ' + ((versions[q.version_id] || {}).label || 'an earlier version')
+        : q.body;
+      var long = title.length > 220 || (title.match(/\n/g) || []).length > 2 || notes.length > 0;
+      var word = WORDS[q.status] || 'Working on it';
+      if (q.status === 'live') word = 'Live since ' + day(q.live_at || q.updated_at);
+      var h = '<article class="rq' + (asked ? ' has-q' : '') + (isOpen ? ' open' : '') + '" data-id="' + q.id + '"><div class="rq-main">';
+      h += '<div class="rq-top"><span class="st ' + (LOOK[q.status] || '') + '"><i aria-hidden="true"></i>' + esc(word) + '</span><time datetime="' + esc(q.created_at) + '">' + esc(when(q.created_at)) + '</time></div>';
+      h += '<p class="txt">' + esc(title) + '</p>';
+      if (long) h += '<button class="more" type="button" data-act="more" data-id="' + q.id + '" aria-expanded="' + isOpen + '">' + (isOpen ? 'Show less' : (notes.length ? 'Show the conversation' : 'Show more')) + '</button>';
+      if (q.summary && /^(preview|approved|live)$/.test(q.status)) h += '<p class="what"><b>What changed:</b> ' + esc(q.summary) + '</p>';
+      if (files.length) h += '<ul class="sent-files" aria-label="Photos and videos you sent">' + files.map(function(f){
+        return '<li><button type="button" data-act="file" data-path="' + esc(f.path) + '" title="' + esc(f.name) + '">' + esc(f.name) + '</button></li>';
+      }).join('') + '</ul>';
+      if (isOpen && notes.length) h += '<ul class="notes">' + notes.map(function(n){
+        return '<li><b>' + (n.author === 'client' ? 'You' : 'Sunny') + ' · ' + esc(when(n.created_at)) + '</b>' + esc(n.body) + '</li>';
+      }).join('') + '</ul>';
+      if (q.status === 'preview') {
+        var pv = safeUrl(q.preview_url);
+        if (app.confirm === q.id) {
+          h += '<div class="ask"><p>Put this live on your site?</p><div class="acts" style="margin:0">' +
+            '<button class="abtn hot" type="button" data-act="live-yes" data-id="' + q.id + '">Yes, put it live</button>' +
+            '<button class="abtn ghost" type="button" data-act="live-no">Not yet</button></div></div>';
+        } else if (app.change[q.id]) {
+          h += '<div class="ask"><label for="ch-' + q.id + '">What should be different?</label>' +
+            '<textarea id="ch-' + q.id + '" data-draft="change:' + q.id + '">' + esc(app.drafts['change:' + q.id] || '') + '</textarea>' +
+            '<div class="acts"><button class="abtn" type="button" data-act="change-send" data-id="' + q.id + '">Send</button>' +
+            '<button class="abtn ghost" type="button" data-act="change-close" data-id="' + q.id + '">Cancel</button></div></div>';
+        } else {
+          h += '<div class="acts">' + (pv ? '<a class="abtn ghost" href="' + esc(pv) + '" target="_blank" rel="noopener">See preview &#8599;</a>' : '') +
+            '<button class="abtn hot" type="button" data-act="live-ask" data-id="' + q.id + '">Put it live</button>' +
+            '<button class="abtn ghost" type="button" data-act="change-open" data-id="' + q.id + '">Change something</button></div>';
+        }
+      }
+      h += '</div>';
+      if (asked) {
+        h += '<aside class="qpanel" aria-label="Question for you"><p class="q-h">Question for you</p><p class="q">' + esc(asked.body) + '</p>' +
+          '<label for="an-' + q.id + '">Your answer</label><textarea id="an-' + q.id + '" data-draft="answer:' + q.id + '">' + esc(app.drafts['answer:' + q.id] || '') + '</textarea>' +
+          '<button class="abtn" type="button" data-act="answer" data-id="' + q.id + '">Send answer</button></aside>';
+      }
+      return h + '</article>';
+    }).join('');
+  }
+
+  function renderVersions(){
+    var v = app.data.versions;
+    $('vers-wrap').hidden = !v.length;
+    $('vers').innerHTML = v.map(function(x, i){
+      var see = safeUrl(x.url);
+      var h = '<li><span class="lbl">' + esc(x.label) + '<small>' + esc(when(x.created_at)) + '</small></span>';
+      if (see) h += '<a class="abtn ghost" href="' + esc(see) + '" target="_blank" rel="noopener">See it &#8599;</a>';
+      if (i === 0) h += '<span class="now">Live now</span>';
+      else if (app.verConfirm === x.id) h += '<div class="confirm"><span>Go back to this version? Your site will change back to how it was then.</span>' +
+        '<button class="abtn hot" type="button" data-act="ver-yes" data-id="' + x.id + '">Yes, go back</button>' +
+        '<button class="abtn ghost" type="button" data-act="ver-no">Not yet</button></div>';
+      else h += '<button class="abtn ghost" type="button" data-act="ver-ask" data-id="' + x.id + '">Go back to this</button>';
+      return h + '</li>';
+    }).join('');
+  }
+
+  function renderInquiries(){
+    var list = app.data.inquiries;
+    $('inq-empty').hidden = !!list.length;
+    $('inq').innerHTML = list.map(function(q){
+      var isOpen = !!app.inqOpen[q.id], fresh = !q.answered_at;
+      var first = String(q.message || '').split('\n')[0];
+      var h = '<li class="iq' + (fresh ? ' new' : '') + (isOpen ? ' open' : '') + '"><button class="iq-head" type="button" data-act="inq" data-id="' + q.id + '" aria-expanded="' + isOpen + '">' +
+        '<span class="iq-name">' + esc(q.name || 'No name given') + (fresh ? '<span class="iq-tag">New</span>' : '') + '</span>' +
+        '<span class="iq-date">' + esc(when(q.created_at)) + '</span><span class="iq-line">' + esc(first) + '</span></button>';
+      if (isOpen) {
+        var rows = '';
+        if (q.email) rows += '<dt>Email</dt><dd><a href="mailto:' + esc(q.email) + '">' + esc(q.email) + '</a></dd>';
+        if (q.phone) rows += '<dt>Phone</dt><dd><a href="tel:' + esc(String(q.phone).replace(/[^0-9+]/g, '')) + '">' + esc(q.phone) + '</a></dd>';
+        Object.keys(q.details || {}).forEach(function(k){
+          var v = q.details[k]; if (v == null || v === '') return;
+          rows += '<dt>' + esc(k.replace(/[_-]+/g, ' ').replace(/^./, function(c){ return c.toUpperCase(); })) + '</dt><dd>' + esc(typeof v === 'object' ? JSON.stringify(v) : v) + '</dd>';
+        });
+        rows += '<dt>Sent</dt><dd>' + esc(new Date(q.created_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })) + '</dd>';
+        h += '<div class="iq-body"><p class="full">' + esc(q.message) + '</p><dl>' + rows + '</dl>' +
+          '<button class="abtn ' + (fresh ? '' : 'ghost') + '" type="button" data-act="answered" data-id="' + q.id + '">' + (fresh ? 'Mark answered' : 'Mark not answered') + '</button></div>';
+      }
+      return h + '</li>';
+    }).join('');
+  }
+
+  // Remember what's typed in a card, so a refresh never wipes it.
+  $('v-home').addEventListener('input', function(e){
+    var k = e.target.dataset && e.target.dataset.draft; if (k) app.drafts[k] = e.target.value;
+  });
+
+  $('v-home').addEventListener('click', async function(e){
+    var b = e.target.closest('[data-act]'); if (!b) return;
+    var act = b.dataset.act, id = b.dataset.id;
+    if (act === 'tab') return setTab(b.dataset.tab);
+    if (act === 'attach') return $('pick').click();
+    if (act === 'unpick') { app.files.splice(Number(b.dataset.i), 1); return chips(); }
+    if (act === 'more') { app.open[id] = !app.open[id]; return renderCards(); }
+    if (act === 'file') return openFile(b.dataset.path);
+    if (act === 'live-ask') { app.confirm = id; app.change = {}; renderCards(); return focusIn('[data-act=live-yes]'); }
+    if (act === 'live-no') { app.confirm = null; return renderCards(); }
+    if (act === 'change-open') { app.change[id] = true; app.confirm = null; renderCards(); return focusIn('#ch-' + id); }
+    if (act === 'change-close') { delete app.change[id]; return renderCards(); }
+    if (act === 'ver-ask') { app.verConfirm = id; renderVersions(); return focusIn('[data-act=ver-yes]'); }
+    if (act === 'ver-no') { app.verConfirm = null; return renderVersions(); }
+    if (act === 'inq') { app.inqOpen[id] = !app.inqOpen[id]; return renderInquiries(); }
+    b.disabled = true;
+    try {
+      if (act === 'answer') await reply(id, 'answer', 'answered', 'Thanks. Back to work on it.', 'Please type your answer.');
+      if (act === 'change-send') await reply(id, 'change', 'redo', "Got it. We'll make that change.", 'Please say what should be different.');
+      if (act === 'live-yes') {
+        await move(id, 'approved');
+        app.confirm = null; toast('Going live now.');
+      }
+      if (act === 'ver-yes') {
+        var v = app.data.versions.find(function(x){ return x.id === id; });
+        var r = await sb.from('requests').insert({ id: uuid(), client_slug: app.slug, kind: 'restore', version_id: id, body: 'Go back to: ' + (v ? v.label : 'an earlier version') });
+        if (r.error) throw r.error;
+        app.verConfirm = null; toast("Got it. We'll put that version back.");
+      }
+      if (act === 'answered') {
+        var q = app.data.inquiries.find(function(x){ return x.id === id; });
+        var u = await sb.from('inquiries').update({ answered_at: q.answered_at ? null : new Date().toISOString() }).eq('id', id).select('id');
+        if (u.error || !u.data.length) throw u.error || new Error('not saved');
+      }
+      await load(true);
+    } catch (err) {
+      if (err && err.quiet) return;
+      toast("That didn't go through. Please try again.");
+    } finally { b.disabled = false; }
+  });
+
+  async function move(id, status){
+    var r = await sb.from('requests').update({ status: status }).eq('id', id).select('id');
+    if (r.error || !r.data.length) throw r.error || new Error('not moved');
+  }
+  async function reply(id, kind, status, done, empty){
+    var key = kind + ':' + id, text = String(app.drafts[key] || '').trim();
+    if (!text) { toast(empty); var e = new Error('empty'); e.quiet = true; throw e; }
+    var n = await sb.from('notes').insert({ request_id: id, client_slug: app.slug, author: 'client', body: text });
+    if (n.error) throw n.error;
+    await move(id, status);
+    delete app.drafts[key]; delete app.change[id];
+    toast(done);
+  }
+  function focusIn(sel){ var el = $('v-home').querySelector(sel); if (el) el.focus(); }
+  async function openFile(path){
+    var w = window.open('', '_blank');
+    var r = await sb.storage.from('uploads').createSignedUrl(path, 3600);
+    if (r.error) { if (w) w.close(); return toast("Couldn't open that file."); }
+    if (w) w.location = r.data.signedUrl; else location.href = r.data.signedUrl;
+  }
+
+  function setTab(t){
+    app.tab = t;
+    ['changes', 'inq'].forEach(function(k){
+      var on = k === t;
+      $('tab-' + k).setAttribute('aria-selected', on);
+      $('p-' + k).hidden = !on;
+    });
+  }
+  $('tabs').addEventListener('keydown', function(e){
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    var next = app.tab === 'changes' ? 'inq' : 'changes';
+    setTab(next); $('tab-' + next).focus();
+  });
+
+  // The box: text, photos and videos, Send.
+  function addFiles(list){
+    Array.from(list || []).forEach(function(f){
+      if (!/^(image|video)\//.test(f.type)) return toast('Only photos and videos can be added here.');
+      if (f.size > MAX) return toast(f.name + ' is too big. Files can be up to 500 MB.');
+      app.files.push(f);
+    });
+    chips();
+  }
+  function chips(){
+    $('chips').innerHTML = app.files.map(function(f, i){
+      return '<li><span title="' + esc(f.name) + '">' + esc(f.name) + ' · ' + size(f.size) + '</span>' +
+        '<button type="button" data-act="unpick" data-i="' + i + '" aria-label="Remove ' + esc(f.name) + '">&times;</button></li>';
+    }).join('');
+  }
+  $('pick').addEventListener('change', function(){ addFiles(this.files); this.value = ''; });
+  var box = $('compose'), depth = 0;
+  box.addEventListener('dragenter', function(e){ e.preventDefault(); depth++; box.classList.add('drag'); });
+  box.addEventListener('dragover', function(e){ e.preventDefault(); });
+  box.addEventListener('dragleave', function(){ if (--depth <= 0) { depth = 0; box.classList.remove('drag'); } });
+  box.addEventListener('drop', function(e){ e.preventDefault(); depth = 0; box.classList.remove('drag'); addFiles(e.dataTransfer.files); });
+
+  function progress(done, total){
+    var pct = total ? Math.min(100, Math.round(done / total * 100)) : 100;
+    $('prog-t').textContent = 'Uploading photos and videos: ' + pct + '%';
+    $('prog-f').style.width = pct + '%';
+  }
+  async function upload(path, file, onBytes){
+    var token = (await sb.auth.getSession()).data.session.access_token;
+    return new Promise(function(resolve, reject){
+      var x = new XMLHttpRequest();
+      x.open('POST', URL_ + '/storage/v1/object/uploads/' + path.split('/').map(encodeURIComponent).join('/'));
+      x.setRequestHeader('Authorization', 'Bearer ' + token);
+      x.setRequestHeader('apikey', KEY);
+      x.setRequestHeader('x-upsert', 'false');
+      x.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
+      x.upload.onprogress = function(e){ if (e.lengthComputable) onBytes(e.loaded); };
+      x.onload = function(){ x.status >= 200 && x.status < 300 ? resolve() : reject(new Error('upload ' + x.status)); };
+      x.onerror = function(){ reject(new Error('upload failed')); };
+      x.send(file);
+    });
+  }
+
+  box.addEventListener('submit', async function(e){
+    e.preventDefault();
+    if (app.sending) return;
+    var text = $('ask').value.trim();
+    if (!text) { toast('Please say what should change.'); return $('ask').focus(); }
+    app.sending = true; $('send').disabled = true;
+    var id = uuid(), files = app.files.slice(), total = files.reduce(function(s, f){ return s + f.size; }, 0), base = 0, rows = [];
+    try {
+      // Photos and videos first, then the request, so the Mac never picks up
+      // a request whose files are still on their way.
+      if (files.length) { $('prog').hidden = false; progress(0, total); }
+      for (var i = 0; i < files.length; i++) {
+        var f = files[i];
+        var name = (i + 1) + '-' + (f.name.replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(-80) || 'file');
+        var path = app.slug + '/' + id + '/' + name;
+        await upload(path, f, function(n){ progress(base + n, total); });
+        base += f.size;
+        rows.push({ request_id: id, client_slug: app.slug, path: path, name: f.name, size: f.size, type: f.type });
+      }
+      var r = await sb.from('requests').insert({ id: id, client_slug: app.slug, body: text });
+      if (r.error) throw r.error;
+      if (rows.length) { var fr = await sb.from('files').insert(rows); if (fr.error) throw fr.error; }
+      $('ask').value = ''; app.files = []; chips();
+      toast('Sent. We’ve got it.');
+      await load(true);
+    } catch (err) {
+      toast("That didn't send. Please try again.");
+    } finally {
+      app.sending = false; $('send').disabled = false; $('prog').hidden = true;
+    }
   });
 
   (async function start(){
@@ -179,7 +716,7 @@ input:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(17,17
       document.getElementById('setpw-h').textContent = linkType === 'invite' ? 'Welcome. Set your password' : 'Set a new password';
       return show('setpw');
     }
-    if (s) return goHome(s.user);
+    if (s) return openApp(s.user);
     show('signin');
   })();
 })();
